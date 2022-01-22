@@ -1,4 +1,4 @@
-# Administración y diseño de bases de datos: Modelo-Objeto-Relacional-Arquitectos
+# Administración y diseño de bases de datos: Modelo Objeto Relacional Arquitectos
 
 ## Integrantes del grupo:
    * Jorge Acevedo de León (alu0101123622@ull.edu.es)
