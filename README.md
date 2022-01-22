@@ -12,3 +12,5 @@ Realizar el modelo del ejerccicio de Proyectos Arquitectonicos UML y el script p
 
 
 ## Diseño objeto Relacional-UML
+
+![](fotos-proyectos/uml.png)
