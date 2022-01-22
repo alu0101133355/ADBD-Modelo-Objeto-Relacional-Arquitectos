@@ -7,7 +7,7 @@
 * @Date:   2021-01-22
 */
 
-DROP TABLE IF EXISTS Directores;
+DROP TABLE IF EXISTS Director;
 DROP TABLE IF EXISTS Proyecto;
 DROP TABLE IF EXISTS Jefe_Proyecto;
 DROP TABLE IF EXISTS Plano;
@@ -135,7 +135,7 @@ CREATE TABLE IF NOT EXISTS Jefe_Proyecto OF T_Jefe_Proyecto(
   UNIQUE (Nombre)
 );
 
-CREATE TABLE IF NOT EXISTS Directores (
+CREATE TABLE IF NOT EXISTS Director (
   ID_Jefe_Proyecto_Director int,
   ID_Proyecto_Dirigido int,
   PRIMARY KEY (ID_Proyecto_Dirigido),
@@ -166,5 +166,5 @@ SELECT * FROM Proyecto;
 INSERT INTO Jefe_Proyecto (ID_Jefe_Proyecto, Nombre, Direccion, Telefono) VALUES (6541, 'Pedro', ROW('Calle', 'Los palotes', 'La Laguna', '68861', 'Santa Cruz de Tenerife'), '968716871');
 SELECT * FROM Jefe_Proyecto;
 
-INSERT INTO Directores (ID_Jefe_Proyecto_Director, ID_Proyecto_Dirigido) VALUES (6541, 500);
-SELECT * FROM Directores;
+INSERT INTO Director (ID_Jefe_Proyecto_Director, ID_Proyecto_Dirigido) VALUES (6541, 500);
+SELECT * FROM Director;
