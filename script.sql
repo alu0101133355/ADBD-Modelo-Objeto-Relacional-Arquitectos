@@ -25,8 +25,6 @@ DROP TYPE IF EXISTS T_Linea;
 DROP TYPE IF EXISTS T_Punto;
 DROP TYPE IF EXISTS T_Figura;
 
-DROP TRIGGER IF EXISTS Trigger_Actualizar_Num_Figuras ON Figura;
-DROP FUNCTION IF EXISTS actualizar_num_figuras;
 
 
 CREATE TYPE T_Punto AS (
@@ -56,18 +54,22 @@ CREATE TYPE T_Figura AS (
 
 CREATE TABLE IF NOT EXISTS Figura OF T_Figura (
   PRIMARY KEY (ID_Figura),
-  NOT NULL ID_Plano_Pert
+  ID_Plano_Pert NOT NULL
 );
+
+DROP TRIGGER IF EXISTS Trigger_Actualizar_Num_Figuras ON Figura;
+DROP FUNCTION IF EXISTS actualizar_num_figuras;
 
 CREATE OR REPLACE FUNCTION actualizar_num_figuras() RETURNS TRIGGER AS $actualizar_num_figuras$
   BEGIN
     IF EXISTS(SELECT * FROM Plano
               WHERE (Plano.ID_Plano = new.ID_Plano_Pert)
              ) THEN
+      raise notice 'is here';
       UPDATE Plano
-        SET Plano.N_Figuras = Plano.N_Figuras + 1
-        AND Plano.ID_Figuras = Plano.ID_Figuras || new.ID_Figura
-        WHERE (Plano.ID_Plano = new.ID_Plano_Pert);
+        SET N_Figuras = N_Figuras + 1,
+        ID_Figuras = ID_Figuras || new.ID_Figura
+        WHERE (ID_Plano = new.ID_Plano_Pert);
     END IF;
 
     RETURN NEW;
@@ -75,8 +77,8 @@ CREATE OR REPLACE FUNCTION actualizar_num_figuras() RETURNS TRIGGER AS $actualiz
 $actualizar_num_figuras$ LANGUAGE plpgsql;
 
 CREATE TRIGGER Trigger_Actualizar_Num_Figuras
-  AFTER INSERT OR DELETE ON Figura
-      EXECUTE PROCEDURE actualizar_num_figuras();
+  BEFORE INSERT ON Figura
+      FOR EACH ROW EXECUTE PROCEDURE actualizar_num_figuras();
 
 CREATE TYPE T_Poligono AS (
   N_Lineas int,
@@ -93,12 +95,14 @@ CREATE TYPE T_Plano AS (
   Fecha_Entrega date,
   Arquitectos text[],
   Dibujo_Plano bytea,
-  N_Figuras int,
+  N_Figuras int ,
   ID_Figuras int[]
 );
 
 CREATE TABLE IF NOT EXISTS Plano OF T_Plano(
-  PRIMARY KEY (ID_Plano)
+  PRIMARY KEY (ID_Plano),
+  N_Figuras DEFAULT 0,
+  ID_Figuras DEFAULT array[]::integer[]
 );
 
 CREATE TYPE T_Proyecto AS (
@@ -134,28 +138,33 @@ CREATE TABLE IF NOT EXISTS Jefe_Proyecto OF T_Jefe_Proyecto(
 CREATE TABLE IF NOT EXISTS Directores (
   ID_Jefe_Proyecto_Director int,
   ID_Proyecto_Dirigido int,
-  PRIMARY KEY (Proyecto_Dirigido),
-  UNIQUE (Jefe_Proyecto_Director)
+  PRIMARY KEY (ID_Proyecto_Dirigido),
+  UNIQUE (ID_Jefe_Proyecto_Director)
 );
 
 
-INSERT INTO Linea (ID_Linea, Puntos) VALUES (1, ARRAY[ROW(1, 1)::T_Punto, ROW(1, 2)::T_Punto]);
-INSERT INTO Linea (ID_Linea, Puntos) VALUES (2, ARRAY[ROW(1, 2)::T_Punto, ROW(2, 2)::T_Punto]);
-INSERT INTO Linea (ID_Linea, Puntos) VALUES (3, ARRAY[ROW(2, 2)::T_Punto, ROW(1, 1)::T_Punto]);
+INSERT INTO Linea (ID_Linea, Puntos) VALUES (1, array[ROW(1, 1)::T_Punto, ROW(1, 2)::T_Punto]);
+INSERT INTO Linea (ID_Linea, Puntos) VALUES (2, array[ROW(1, 2)::T_Punto, ROW(2, 2)::T_Punto]);
+INSERT INTO Linea (ID_Linea, Puntos) VALUES (3, array[ROW(2, 2)::T_Punto, ROW(1, 1)::T_Punto]);
 SELECT * FROM Linea;
-SELECT (Puntos[1]).Coord_X FROM Linea WHERE ID_Linea = 1;
 
-INSERT INTO Plano (ID_Plano, Fecha_Entrega, Arquitectos, N_Figuras, ID_Figuras) VALUES (5134, '02/03/2022', ARRAY['Marleoni', 'Acevedoni', 'Serjoeni'], 2, ARRAY[456, 654]);
+INSERT INTO Plano (ID_Plano, Fecha_Entrega, Arquitectos) VALUES (1234, '02/03/2022', array['Marleoni', 'Acevedoni', 'Serjoeni']);
+INSERT INTO Figura (ID_Figura, Nombre, Color, ID_Plano_Pert) VALUES (46, 'Triangulo', 'Verde', 1234);
+INSERT INTO Figura (ID_Figura, Nombre, Color, ID_Plano_Pert) VALUES (47, 'Triangulo', 'Rojo', 1234);
+INSERT INTO Figura (ID_Figura, Nombre, Color, ID_Plano_Pert) VALUES (57, 'Cuadrado', 'Rojo', 1234);
+INSERT INTO Figura (ID_Figura, Nombre, Color, ID_Plano_Pert) VALUES (58, 'Cuadrado', 'Azul', 1234);
+SELECT * FROM Figura;
 SELECT * FROM Plano;
 
-INSERT INTO Figura (ID_Figura, Nombre, Color, ID_Plano_Pert) VALUES (456, 'Triangulo', 'Verde', 5134);
-INSERT INTO Figura (ID_Figura, Nombre, Color, ID_Plano_Pert) VALUES (654, 'Cuadrado', 'Rojo', 5134);
-INSERT INTO Figura (ID_Figura, Nombre, Color, ID_Plano_Pert) VALUES (6524, 'Cuadrado', 'Azul', 5134);
-SELECT * FROM Figura;
-
-INSERT INTO Poligono (N_Lineas, ID_Lineas, ID_Figura) VALUES (3, ARRAY[1, 2, 3], 456);
+INSERT INTO Poligono (N_Lineas, ID_Lineas, ID_Figura) VALUES (3, array[1, 2, 3], 46);
+INSERT INTO Poligono (N_Lineas, ID_Lineas, ID_Figura) VALUES (3, array[1, 3, 2], 47);
 SELECT * FROM Poligono;
+
+INSERT INTO Proyecto (ID_Proyecto, Nombre, ID_Planos) VALUES (500, 'Auditorio ULL', array[1234]);
+SELECT * FROM Proyecto;
 
 INSERT INTO Jefe_Proyecto (ID_Jefe_Proyecto, Nombre, Direccion, Telefono) VALUES (6541, 'Pedro', ROW('Calle', 'Los palotes', 'La Laguna', '68861', 'Santa Cruz de Tenerife'), '968716871');
 SELECT * FROM Jefe_Proyecto;
-SELECT (Direccion).Nombre_via FROM Jefe_Proyecto WHERE (Direccion).Tipo_via LIKE 'Calle';
+
+INSERT INTO Directores (ID_Jefe_Proyecto_Director, ID_Proyecto_Dirigido) VALUES (6541, 500);
+SELECT * FROM Directores;
