@@ -4,7 +4,7 @@
 *           Javier Martín
 *           Sergio Tabares
 *
-* @Date:   2021-01-22
+* @Date:   2022-01-22
 */
 
 DROP TABLE IF EXISTS Director;
