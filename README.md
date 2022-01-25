@@ -19,7 +19,7 @@ Realizar el modelo del ejerccicio de Proyectos Arquitectonicos UML y el script p
 
 En primer lugar tenemos la relacion de proyecto y jefe de proyectos:
 
-![](fotos-proyectos/select-proyecto-jefe_proyecto)
+![](fotos-proyectos/select-proyecto-jefe_proyecto.png)
 
 En segundo lugar la relacon de plano y figura:
 
