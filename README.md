@@ -14,3 +14,25 @@ Realizar el modelo del ejerccicio de Proyectos Arquitectonicos UML y el script p
 ## Diseño objeto Relacional-UML
 
 ![](fotos-proyectos/uml.png)
+
+## Realizamos los select pertinentes a cada una de las tablas creadas
+
+En primer lugar tenemos la relacion de proyecto y jefe de proyectos:
+
+![](fotos-proyectos/select-proyecto-jefe_proyecto)
+
+En segundo lugar la relacon de plano y figura:
+
+![](fotos-proyectos/select-plano-figura.png)
+
+En tercer lugar tenemos los polígonos:
+
+![](fotos-proyectos/select-poligono.png)
+
+Por ultimo encontramos la tabla de linea:
+
+![](fotos-proyectos/select-linea.png)
+
+
+
+
